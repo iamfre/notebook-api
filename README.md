@@ -7,11 +7,11 @@
 4. php artisan storage:link
 
 # Функционал
-1.1. GET /api/v1/notebook/ - получить список записей с пагинацией
-1.2. POST /api/v1/notebook/ - добавить новую запись
-1.3. GET /api/v1/notebook/<id>/ - получить запись
-1.4. POST /api/v1/notebook/<id>/ - обновить запись
-1.5. DELETE /api/v1/notebook/<id>/ - удалить запись
+* GET /api/v1/notebook/ - получить список записей с пагинацией
+* POST /api/v1/notebook/ - добавить новую запись
+* GET /api/v1/notebook/<id>/ - получить запись
+* POST /api/v1/notebook/<id>/ - обновить запись
+* DELETE /api/v1/notebook/<id>/ - удалить запись
 
 # Examples
 API documentaion
