@@ -31,10 +31,13 @@ class NotebookController extends Controller
     public function store(Request $request): array
     {
         $errors = [];
+        $photoPath = null;
 
         $phone = $request->get('phone');
         $fullName = $request->get('fio');
         $email = $request->get('email');
+
+        $photo = $request->file('photo');
 
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'Не заполнено или не корректное поле email';
@@ -48,6 +51,12 @@ class NotebookController extends Controller
             $errors[] = 'Не заполнено поле fio';
         }
 
+        if (!empty($photo)) {
+            $disk = $request->input('disk', 'public');
+            $fileName = time() . '_' . $photo->getClientOriginalName();
+            $photoPath = $photo->storeAs('photos', $fileName, ['disk' => $disk]);
+        }
+
         if (empty($errors)) {
             $notebook = Notebook::create([
                 'phone' => $phone,
@@ -55,7 +64,7 @@ class NotebookController extends Controller
                 'fio' => $fullName,
                 'birthday' => $request->get('birthday'),
                 'company' => $request->get('company'),
-                'photo' => $request->get('photo'),
+                'photo' => !empty($photoPath) ? url('/storage/'.$photoPath) : null,
             ]);
         }
 
