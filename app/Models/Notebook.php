@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Notebook extends Model
 {
     use HasFactory;
+
+    public $fillable = ['fio', 'company', 'phone', 'email', 'birthday', 'photo'];
 }
