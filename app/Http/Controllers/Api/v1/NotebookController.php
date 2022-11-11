@@ -26,13 +26,44 @@ class NotebookController extends Controller
      * Store a newly created resource in storage.
      *
      * @param NotebookStoreRequest $request
-     * @return NotebookResource
+     * @return array
      */
-    public function store(NotebookStoreRequest $request): NotebookResource
+    public function store(Request $request): array
     {
-        $notebook = Notebook::create($request->validated());
+        $errors = [];
 
-        return new NotebookResource($notebook);
+        $phone = $request->get('phone');
+        $fullName = $request->get('fio');
+        $email = $request->get('email');
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Не заполнено или не корректное поле email';
+        }
+
+        if (empty($phone)) {
+            $errors[] = 'Не заполнено поле phone';
+        }
+
+        if (empty($fullName)) {
+            $errors[] = 'Не заполнено поле fio';
+        }
+
+        if (empty($errors)) {
+            $notebook = Notebook::create([
+                'phone' => $phone,
+                'email' => $email,
+                'fio' => $fullName,
+                'birthday' => $request->get('birthday'),
+                'company' => $request->get('company'),
+                'photo' => $request->get('photo'),
+            ]);
+        }
+
+        return [
+            'success' => empty($errors),
+            'errors' => $errors,
+            'notebook' => !empty($notebook) ? new NotebookResource($notebook) : null,
+        ];
     }
 
     /**
