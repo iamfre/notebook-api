@@ -7,7 +7,6 @@ use App\Http\Requests\NotebookStoreRequest;
 use App\Http\Resources\NotebookResource;
 use App\Models\Notebook;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\App;
 
 class NotebookController extends Controller
@@ -15,11 +14,22 @@ class NotebookController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return AnonymousResourceCollection
+     * @return array
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): array
     {
-        return NotebookResource::collection(Notebook::get());
+        $perPage = $request->get('per_page', 10);
+        $orderColumn = $request->get('sort_by', 'fio');
+        $orderDirection = $request->get('sort_order', 'ASC');
+
+        $notes = Notebook::orderBy($orderColumn, $orderDirection)->paginate($perPage);
+
+        return [
+            'total' => $notes->total(),
+            'perPage' => $notes->perPage(),
+            'page' => $notes->currentPage(),
+            'items' => $notes->items(),
+        ];
     }
 
     /**
