@@ -9,6 +9,7 @@ use App\Models\Notebook;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\App;
 
 class NotebookController extends Controller
 {
@@ -33,6 +34,10 @@ class NotebookController extends Controller
         $errors = [];
         $photoPath = null;
 
+        // TODO: смена локали через middleware
+        $locale = $request->headers->get('Accept-Language') ?? 'ru';
+        App::setLocale($locale);
+
         $phone = $request->get('phone');
         $fullName = $request->get('fio');
         $email = $request->get('email');
@@ -41,10 +46,22 @@ class NotebookController extends Controller
 
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'Не заполнено или не корректное поле email';
+        } else {
+            $existNotebookByEmail = Notebook::whereEmail($email)->first();
+
+            if (!empty($existNotebookByEmail)) {
+                $errors[] = __('validation.already_exist_notebook', ['attribute' => 'Email', 'value' => $email]);
+            }
         }
 
         if (empty($phone)) {
             $errors[] = 'Не заполнено поле phone';
+        } else {
+            $existNotebookByPhone = Notebook::wherePhone($phone)->first();
+
+            if (!empty($existNotebookByPhone)) {
+                $errors[] = __('validation.already_exist_notebook', ['attribute' => 'Phone', 'value' => $phone]);
+            }
         }
 
         if (empty($fullName)) {
