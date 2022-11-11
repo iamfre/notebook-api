@@ -8,7 +8,6 @@ use App\Http\Resources\NotebookResource;
 use App\Models\Notebook;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 
 class NotebookController extends Controller
@@ -95,47 +94,84 @@ class NotebookController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Notebook $notebook
-     * @return NotebookResource
+     * @param $id
+     * @return array
      */
-    public function show(Notebook $notebook): NotebookResource
+    public function show($id)
     {
-        return new NotebookResource($notebook);
+        $errors = [];
+        $notebook = Notebook::find($id);
+
+        if (empty($notebook)) {
+            $errors[] = 'Запись не найдена';
+        }
+
+        return [
+            'success' => empty($errors),
+            'errors' => $errors,
+            'notebook' => !empty($notebook) ? new NotebookResource($notebook) : null,
+        ];
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param NotebookStoreRequest $request
-     * @param Notebook $notebook
-     * @return NotebookResource
+     * @param $id
+     * @return array
      */
-    public function update(Request $request, Notebook $notebook): NotebookResource
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'fio' => 'max:200',
-            'company' => 'max:200',
-            'phone' => 'numeric',
-            'email' => 'email',
-            'birthday' => 'date',
-            'photo' => 'max:350',
-        ]);
+        $errors = [];
 
-        $notebook->update($validated);
+        $notebook = Notebook::find($id);
 
-        return new NotebookResource($notebook);
+        if (empty($notebook)) {
+            $errors[] = 'Запись не найдена';
+        }
+
+        if (empty($errors)) {
+
+            $validated = $request->validate([
+                'fio' => 'max:200',
+                'company' => 'max:200',
+                'phone' => 'numeric',
+                'email' => 'email',
+                'birthday' => 'date',
+                'photo' => 'max:350',
+            ]);
+
+            $notebook->update($validated);
+        }
+
+        return [
+            'success' => empty($errors),
+            'errors' => $errors,
+            'notebook' => !empty($notebook) ? new NotebookResource($notebook) : null,
+        ];
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Notebook $notebook
-     * @return Response
+     * @param $id
+     * @return array
      */
-    public function destroy(Notebook $notebook): Response
+    public function destroy($id): array
     {
-        $notebook->delete();
+        $errors = [];
 
-        return response(null, Response::HTTP_NO_CONTENT);
+        $notebook = Notebook::find($id);
+
+        if (!empty($notebook)) {
+            $notebook->delete();
+        } else {
+            $errors[] = 'Запись не найдена';
+        }
+
+        return [
+            'success' => empty($errors),
+            'errors' => $errors,
+        ];
     }
 }
