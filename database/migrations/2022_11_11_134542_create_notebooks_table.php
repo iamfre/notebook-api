@@ -16,11 +16,11 @@ class CreateNotebooksTable extends Migration
         Schema::create('notebooks', function (Blueprint $table) {
             $table->id();
             $table->string('fio');
-            $table->string('company');
+            $table->string('company')->nullable();
             $table->string('phone')->unique();
             $table->string('email')->unique();
-            $table->date('birthday');
-            $table->string('photo');
+            $table->date('birthday')->nullable();
+            $table->string('photo')->nullable();
             $table->timestamps();
         });
     }
