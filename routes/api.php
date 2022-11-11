@@ -19,6 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResources([
-    'notebooks' => NotebookController::class,
-]);
+Route::prefix('v1')->group(function () {
+    Route::apiResources([
+        'notebooks' => NotebookController::class,
+    ]);
+});
