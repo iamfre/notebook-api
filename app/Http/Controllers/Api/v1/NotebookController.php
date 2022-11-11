@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\v1;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\NotebookStoreRequest;
 use App\Http\Resources\NotebookResource;
 use App\Models\Notebook;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
@@ -51,9 +53,18 @@ class NotebookController extends Controller
      * @param Notebook $notebook
      * @return NotebookResource
      */
-    public function update(NotebookStoreRequest $request, Notebook $notebook): NotebookResource
+    public function update(Request $request, Notebook $notebook): NotebookResource
     {
-        $notebook->update($request->validated());
+        $validated = $request->validate([
+            'fio' => 'max:200',
+            'company' => 'max:200',
+            'phone' => 'numeric',
+            'email' => 'email',
+            'birthday' => 'date',
+            'photo' => 'max:350',
+        ]);
+
+        $notebook->update($validated);
 
         return new NotebookResource($notebook);
     }
